@@ -25,84 +25,73 @@ const { ListNode } = require('../extensions/list-node.js');
 class linkedList {
   constructor() {
       this.head = null;
-      this.tail = null;
+      this.length = 0;
   }
 
   add(value) {
-      const newNode = new ListNode(value);
-
-      // Если нет head или tail, делаем новым узлом head и tail.
-      if (!this.head || !this.tail) {
-          this.head = newNode;
-          this.tail = newNode;
-
-          return this;
+      if (this.length === 0) {
+        this.head = new ListNode(value);
+      } else {
+        let current = this.head;
+  
+        while(current.next) {
+          current = current.next;
+        }
+  
+        current.next = new ListNode(value);
       }
-      // Присоединяем новый узел к концу связного списка.
-      // Берём последний узел и указываем, что его next будет новым узлом.
-      this.tail.next = newNode;
-
-      // Переназначаем tail на новый узел.
-      this.tail = newNode;
-      return this;
-  }
+  
+      this.length++;
+    }
 
   remove(value) {
+      let sizeList = this.length;
+
       if (!this.head) {
           return null;
       }
-
       let deletedNode = null;
       let current = this.head;
+      let index = 0;
+      while (index < sizeList) {
+          if (this.head && this.head.value === value) {
+              deletedNode = this.head;
+              this.head = current.next;
+              current = this.head;
+          } else {
+              let prev = null;
 
-      // Если head должен быть удален, то делаем следующий узел новым head.
-      while (this.head && this.head.value === value) {
-          deletedNode = this.head;
-          this.head = this.head.next;
-      }
-
-      if (current !== null) {
-          while (current.next) {
-              if (current.next.value === value) {
-                  deletedNode = current.next;
-                  current.next = current.next.next;
-              } else {
-                  current = current.next;
+              while (current) {
+                  while (current && current.value !== value) {
+                      prev = current;
+                      current = current.next;
+                  }
+      
+                  if (current && current.next) {
+                      prev.next = current.next;
+                      current = current.next;
+                  } else {
+                      prev.next = null;
+                      current = null;
+                  }
               }
-          }
+              index++;
+              this.length--;
+          }  
       }
-      if (this.tail && this.tail.value === value) {
-          this.tail = current;
-      }
-      return deletedNode ? this : null;
-  }
-
-  conversionToArray() {
-      let current = this.head;
-      let result = [];
-
-      if (current !== null) {
-        while (current.next !== null) {
-          result.push(current.value); 
-          current = current.next;           
-      }
-
-      result.push(this.tail.value);
-      }
-      return result;
+      return this; 
   }
 }
 
 function removeKFromList(l, k) {
  let nodeItems = new linkedList(l);
- let result = [];
 
  for (let i=0; i<l.length; i++) {
   nodeItems.add(l[i]);
  }
 
  nodeItems.remove(k);
- return  nodeItems.conversionToArray().includes(k) ? nodeItems.conversionToArray() : null;
+ return nodeItems.head;
 }
 
 module.exports = {
